@@ -6,7 +6,7 @@ import streamlit as st
 
 # Initialize the client
 async def create_supabase_connection():
-    supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_URL"])
+    supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
     print("Supabase connection created: ", supabase)
     return supabase
 
