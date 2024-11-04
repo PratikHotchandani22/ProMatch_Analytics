@@ -1,12 +1,12 @@
-from credentials import SUPABASE_URL, SUPABASE_KEY
 from supabase import create_client, Client
 import asyncio
 from itertools import islice
 import pandas as pd
+import streamlit as st
 
 # Initialize the client
 async def create_supabase_connection():
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_URL"])
     print("Supabase connection created: ", supabase)
     return supabase
 

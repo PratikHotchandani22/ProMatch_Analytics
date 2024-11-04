@@ -1,7 +1,0 @@
-SUPABASE_KEY = ""
-SUPABASE_URL = ""
-
-
-GROQ_API = ""
-
-OPENAI_API = ""

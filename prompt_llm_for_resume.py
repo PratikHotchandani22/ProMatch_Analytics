@@ -2,7 +2,6 @@ import json
 import pandas as pd
 from langchain_groq import ChatGroq
 import streamlit as st
-from credentials import GROQ_API
 
 async def run_llama_prompt(user_prompt, system_prompt, model):
     """
@@ -27,7 +26,7 @@ async def run_llama_prompt(user_prompt, system_prompt, model):
         # Send the custom prompt to the LLaMA 3.1 model
 
         llm = ChatGroq(
-            api_key = GROQ_API,
+            api_key = st.secrets["GROQ_API"],
             model=model,
             temperature=0,
             max_tokens=None,
@@ -78,7 +77,7 @@ async def summarize_job_description(systemPrompt, userPrompt, model):
         # Send the custom prompt to the LLaMA 3.1 model
 
         llm = ChatGroq(
-            api_key = GROQ_API,
+            api_key = st.secrets["GROQ_API"],
             model=model,
             temperature=0.5,
             max_tokens=None,

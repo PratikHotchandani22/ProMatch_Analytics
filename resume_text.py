@@ -1,7 +1,6 @@
 import docx
 import streamlit as st
 from langchain_groq import ChatGroq
-from credentials import GROQ_API
 
 
 def extract_text_from_docx(file_path):
@@ -40,7 +39,7 @@ async def extract_resume_sections_langchain(prompt, model_name, resume_text):
         # Send the custom prompt to the LLaMA 3.1 model
 
         llm = ChatGroq(
-            api_key = GROQ_API,
+            api_key = st.secrets["GROQ_API"],
             model=model_name,
             temperature=0,
             max_tokens=None,

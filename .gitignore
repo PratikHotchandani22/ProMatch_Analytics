@@ -163,3 +163,4 @@ cython_debug/
 
 /Extras
 /tmp_dir
+secrets.toml
