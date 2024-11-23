@@ -5,6 +5,8 @@ from resume_text import extract_text_from_docx, extract_resume_sections_langchai
 from sklearn.metrics.pairwise import cosine_similarity
 from prompt_llm_for_resume import run_llama_prompt
 import streamlit as st
+from prompt_openai import run_openai_chat_completion
+
 
 TEMP_DIR = "temp_dir"
 os.makedirs(TEMP_DIR, exist_ok=True)  # This will create the directory if it does not exist
@@ -69,7 +71,7 @@ async def get_file_paths(uploaded_files):
 
     return file_paths
 
-async def suggest_resume_improvements(system_prompt, structured_job_data, resume_text, model_name):
+async def suggest_resume_improvements(openai_client, system_prompt, structured_job_data, resume_text, rag_text, model_name, model_temp):
     
     ## Construct a user_prompt that will have structure job description 
     # Convert all columns in the job description DataFrame to a single text string
@@ -78,15 +80,16 @@ async def suggest_resume_improvements(system_prompt, structured_job_data, resume
     # Prepare the user_prompt with resume_text and job_description_text
     user_prompt = f'''
     "resume_text" : "{resume_text}",
-    "job_description_text" : "{structured_job_data}"
+    "job_description_text" : "{structured_job_data}",
+    "rag_text" : "{rag_text}",
     '''
-
+    
     # Generate suggestions using the LLaMA model
-    suggestions = await run_llama_prompt(user_prompt, system_prompt ,model_name)
+    suggestions = await run_openai_chat_completion(openai_client, user_prompt, system_prompt, model_name, model_temp)
     
     return suggestions
 
-async def prepare_cover_letter(system_prompt, llama_response, best_resume_text, model_name):
+async def prepare_cover_letter(openai_client, system_prompt, llama_response, best_resume_text, model_name, model_temp):
 
     ## Construct a user_prompt that will have structure job description 
     # Convert all columns in the job description DataFrame to a single text string
@@ -97,8 +100,25 @@ async def prepare_cover_letter(system_prompt, llama_response, best_resume_text, 
     "resume_text" : "{best_resume_text}",
     "job_description_text" : "{llama_response}"
     '''
+    input_text = system_prompt + user_prompt
 
     # Generate suggestions using the LLaMA model
-    cover_letter = await run_llama_prompt(user_prompt, system_prompt ,model_name)
+    cover_letter = await run_openai_chat_completion(openai_client, user_prompt, system_prompt, model_name, model_temp)
     
     return cover_letter
+
+def find_rag_data_match_percentage(rag_df, job_desc_embedding):
+
+    # Ensure embeddings are numpy arrays
+    rag_embeddings = np.vstack(rag_df['text_embedding'].to_numpy())
+    job_desc_embedding = np.vstack(job_desc_embedding['job_description_embeddings'].to_numpy()).reshape(1, -1)
+    
+    # Calculate cosine similarity and get percentage match
+    similarities = cosine_similarity(rag_embeddings, job_desc_embedding)
+    rag_df['percentage_match'] = similarities.flatten() * 100  # Convert to percentage
+
+    # Get resume_data with the highest match
+    best_rag_data = rag_df[rag_df['percentage_match'] >= 30 ]
+    #best_rag_row = rag_df.loc[rag_df['percentage_match'].idxmax()]
+    #best_rag_data = best_rag_row['text']  # Extract the rag text
+    return best_rag_data, rag_df  # Return best match rag text and full DataFrame with percentage matches
