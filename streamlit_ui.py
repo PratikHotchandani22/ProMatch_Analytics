@@ -200,21 +200,12 @@ async def main():
                 #st.write(df)
                 #st.write("All entries: ", st.session_state.entries)
 
-    # Select between existing resume or new resume
-    option = st.radio("Choose an option:", ["Provide Job URL (works only for Glassdoor urls)", "Enter job description manually"])
-
-    if option == "Provide Job URL (works only for Glassdoor urls)":
-
-        # Section to input the job URL
-        #st.subheader("Enter Job URL")
-        job_url = st.text_input("Paste the job URL here")
-        st.session_state.job_link = job_url
-        job_description_input = ""
     
-    elif option == "Enter job description manually":
-        job_description_input = st.text_area("Paste the job description here", height=200)
-        st.session_state.job_entry = job_description_input
-        st.session_state.job_link = ""
+    
+    st.subheader("Enter job description")
+    job_description_input = st.text_area("Paste the job description here", height=200)
+    st.session_state.job_entry = job_description_input
+    st.session_state.job_link = ""
 
     # Submit button
     
